@@ -1,1 +1,7 @@
 Get https://google.com HTTP/1.1
+#
+
+Get https://dmi.dk HTTP/1.1
+#
+
+Get https://dr.dk HTTP/1.1

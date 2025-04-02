@@ -30,8 +30,9 @@ public class SourceGenerator : IIncrementalGenerator
                 var i = 0;
                 foreach (var request in requests)
                 {
+                    var requestName = new Uri(request.Endpoint).Host.Replace(".", "_").ToLowerInvariant();
                     sb.AppendLine("    [Xunit.Fact]");
-                    sb.AppendLine($"    public async Task {request.Method}_Request_{i++}()");
+                    sb.AppendLine($"    public async Task {request.Method.ToLowerInvariant()}_{requestName}_{i++}()");
                     sb.AppendLine("    {");
                     sb.AppendLine("        var sut = new System.Net.Http.HttpClient();");
                     sb.AppendLine($"        var response = await sut.{request.Method}Async(\"{request.Endpoint}\");");
