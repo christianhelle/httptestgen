@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="HttpTestGen.SourceGenerator.Tests/HttpTestGen.SourceGenerator.Tests.csproj" />
+  <Project Path="HttpTestGen.SourceGenerator/HttpTestGen.SourceGenerator.csproj" />
+  <Project Path="HttpTestGen.Tests/HttpTestGen.Tests.csproj" />
+</Solution>
