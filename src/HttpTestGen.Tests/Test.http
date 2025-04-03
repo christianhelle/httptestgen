@@ -1,7 +1,17 @@
-Get https://google.com HTTP/1.1
 #
+GET https://google.com HTTP/1.1
 
-Get https://dmi.dk HTTP/1.1
 #
+GET https://youtube.com HTTP/1.1
 
-Get https://dr.dk HTTP/1.1
+#
+GET https://x.com HTTP/1.1
+
+#
+GET https://facebook.com
+
+#
+GET https://webhook.site/c8993df6-0ed2-42b6-b540-7033c5c12aed
+
+#
+GET https://webhook.site/c8993df6-0ed2-42b6-b540-7033c5c12aed
