@@ -22,7 +22,11 @@ public class SourceGenerator : IIncrementalGenerator
             namesAndContents,
             (sourceProductionContext, nameAndContent) =>
             {
-                GenerateHttpTests(sourceProductionContext, nameAndContent.name, nameAndContent.content,, httpFileParser);
+                GenerateHttpTests(
+                    sourceProductionContext,
+                    nameAndContent.name,
+                    nameAndContent.content,
+                    httpFileParser);
             });
     }
 
