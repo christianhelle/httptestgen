@@ -1,4 +1,5 @@
 ﻿using System.Collections.Specialized;
+using System.Text;
 
 namespace HttpTestGen.SourceGenerator;
 
@@ -10,18 +11,29 @@ public class HttpFileParser
         for (int i = 0; i < lines.Length; i++)
         {
             string line = lines[i];
-            if (line.StartsWith("#") || string.IsNullOrWhiteSpace(line))
+            if (line.StartsWith("#") ||
+                lines[Math.Max(0, i - 1)].StartsWith("#"))
             {
                 continue;
             }
 
             var requestLine = line.Split(' ');
+            if (requestLine.Length < 2)
+            {
+                continue;
+            }
+
             var method = requestLine[0];
             var endpoint = requestLine[1];
-            var httpVersion = requestLine[2];
+
             var headers = new StringDictionary();
-            for (int j = i; j < lines.Length; j++)
+            for (int j = i + 1; j < lines.Length; j++)
             {
+                if (lines[j].StartsWith("#"))
+                {
+                    break;
+                }
+
                 var split = lines[j].Split(':');
                 if (split.Length == 2)
                 {
@@ -34,12 +46,23 @@ public class HttpFileParser
                 }
             }
 
+            StringBuilder body = new();
+            for (int j = i + 1; j < lines.Length; j++)
+            {
+                if (lines[j].StartsWith("#"))
+                {
+                    break;
+                }
+                body.Append(lines[j]);
+                i++;
+            }
+
             yield return new HttpFileRequest
             {
                 Method = method ?? "GET",
                 Endpoint = endpoint.Trim(),
-                HttpVersion = httpVersion.Trim(),
                 Headers = headers,
+                RequestBody = body.ToString().Trim(),
             };
         }
     }
