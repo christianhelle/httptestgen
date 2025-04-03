@@ -22,29 +22,51 @@ public class SourceGenerator : IIncrementalGenerator
             namesAndContents,
             (sourceProductionContext, nameAndContent) =>
             {
-                var requests = httpFileParser.Parse(nameAndContent.content);
-
-                var sb = new StringBuilder();
-                sb.AppendLine($"public class {nameAndContent.name}Tests");
-                sb.AppendLine("{");
-                var i = 0;
-                foreach (var request in requests)
-                {
-                    var requestName = new Uri(request.Endpoint).Host.Replace(".", "_").ToLowerInvariant();
-                    sb.AppendLine("    [Xunit.Fact]");
-                    sb.AppendLine($"    public async Task {request.Method.ToLowerInvariant()}_{requestName}_{i++}()");
-                    sb.AppendLine("    {");
-                    sb.AppendLine("        var sut = new System.Net.Http.HttpClient();");
-                    sb.AppendLine($"        var response = await sut.{request.Method}Async(\"{request.Endpoint}\");");
-                    sb.AppendLine("        Xunit.Assert.True(response.IsSuccessStatusCode);");
-                    sb.AppendLine("    }");
-                }
-                sb.AppendLine("}");
-
-                sourceProductionContext.AddSource(
-                    $"{nameAndContent.name}.http",
-                    sb.ToString()
-                );
+                GenerateHttpTests(sourceProductionContext, nameAndContent.name, nameAndContent.content,, httpFileParser);
             });
+    }
+
+    private static void GenerateHttpTests(
+        SourceProductionContext sourceProductionContext,
+        string httpFilename,
+        string httpFileContents,
+        HttpFileParser httpFileParser)
+    {
+        var requests = httpFileParser.Parse(httpFileContents);
+
+        var sb = new StringBuilder();
+        sb.AppendLine($"public class {httpFilename}Tests");
+        sb.AppendLine("{");
+        var i = 0;
+        foreach (var request in requests)
+        {
+            var method = GetMethod(request);
+            var requestName = new Uri(request.Endpoint).Host.Replace(".", "_").ToLowerInvariant();
+            sb.AppendLine("    [Xunit.Fact]");
+            sb.AppendLine($"    public async Task {method.ToLowerInvariant()}_{requestName}_{i++}()");
+            sb.AppendLine("    {");
+            sb.AppendLine("        var sut = new System.Net.Http.HttpClient();");
+            sb.AppendLine($"        var response = await sut.{method}Async(\"{request.Endpoint}\");");
+            sb.AppendLine("        Xunit.Assert.True(response.IsSuccessStatusCode);");
+            sb.AppendLine("    }");
+        }
+        sb.AppendLine("}");
+
+        sourceProductionContext.AddSource(
+            $"{httpFilename}.http",
+            sb.ToString()
+        );
+    }
+
+    private static string GetMethod(HttpFileRequest request)
+    {
+        return request.Method.ToLowerInvariant() switch
+        {
+            "get" => "Get",
+            "post" => "Post",
+            "put" => "Put",
+            "delete" => "Delete",
+            _ => request.Method,
+        };
     }
 }
