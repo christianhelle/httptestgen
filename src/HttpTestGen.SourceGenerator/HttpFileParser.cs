@@ -10,14 +10,15 @@ public class HttpFileParser
         var lines = content.Split('\n');
         for (int i = 0; i < lines.Length; i++)
         {
-            string line = lines[i];
-            if (line.StartsWith("#") ||
-                lines[Math.Max(0, i - 1)].StartsWith("#"))
+            string line = lines[i].Trim();
+            if (line.StartsWith("#"))
             {
                 continue;
             }
 
-            var requestLine = line.Split(' ');
+            var requestLine = line
+                .TrimStart()
+                .Split([" "], StringSplitOptions.RemoveEmptyEntries);
             if (requestLine.Length < 2)
             {
                 continue;
@@ -59,7 +60,7 @@ public class HttpFileParser
 
             yield return new HttpFileRequest
             {
-                Method = method ?? "GET",
+                Method = method,
                 Endpoint = endpoint.Trim(),
                 Headers = headers,
                 RequestBody = body.ToString().Trim(),
