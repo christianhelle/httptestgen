@@ -19,12 +19,27 @@ public class HttpFileParser
             var method = requestLine[0];
             var endpoint = requestLine[1];
             var httpVersion = requestLine[2];
+            var headers = new StringDictionary();
+            for (int j = i; j < lines.Length; j++)
+            {
+                var split = lines[j].Split(':');
+                if (split.Length == 2)
+                {
+                    headers[split[0].Trim()] = split[1].Trim();
+                    i++;
+                }
+                else
+                {
+                    break;
+                }
+            }
 
             yield return new HttpFileRequest
             {
                 Method = method ?? "GET",
                 Endpoint = endpoint.Trim(),
                 HttpVersion = httpVersion.Trim(),
+                Headers = headers,
             };
         }
     }
