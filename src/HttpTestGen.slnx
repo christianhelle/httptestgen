@@ -1,5 +1,9 @@
 <Solution>
-  <Project Path="HttpTestGen.SourceGenerator.Tests/HttpTestGen.SourceGenerator.Tests.csproj" />
-  <Project Path="HttpTestGen.SourceGenerator/HttpTestGen.SourceGenerator.csproj" />
-  <Project Path="HttpTestGen.Tests/HttpTestGen.Tests.csproj" />
+  <Folder Name="/Source/" Id="02ea681e-c7d8-13c7-8484-4ac65e1b71e8">
+    <Project Path="HttpTestGen.SourceGenerator.Tests/HttpTestGen.SourceGenerator.Tests.csproj" />
+    <Project Path="HttpTestGen.SourceGenerator/HttpTestGen.SourceGenerator.csproj" />
+  </Folder>
+  <Folder Name="/Tests/" Id="5ec89185-6d2e-494a-894c-f2a538f80dbd">
+    <Project Path="HttpTestGen.Tests/HttpTestGen.Tests.csproj" />
+  </Folder>
 </Solution>
