@@ -2,4 +2,6 @@
 
 ## Proof-of-Concept
 
-![proof-of-concept](images/http-testing.png)
+![dotnet test](images/http-testing.png)
+![visual studio](images/http-testing-vs.png)
+
