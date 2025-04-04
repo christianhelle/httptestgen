@@ -8,26 +8,26 @@ public class AssertionsTests
     [Arguments(
         """
         GET https://localhost/notfound
-        EXPECTED_RESPONSE_STATUS: 404
+        EXPECTED_RESPONSE_STATUS 404
         """)]
     [Arguments(
         """
         GET https://localhost/notfound
 
-        EXPECTED_RESPONSE_STATUS: 404
+        EXPECTED_RESPONSE_STATUS 404
         """)]
     [Arguments(
         """
         GET https://localhost/notfound
         Accept: application/json
-        EXPECTED_RESPONSE_STATUS: 404
+        EXPECTED_RESPONSE_STATUS 404
         """)]
     [Arguments(
         """
         GET https://localhost/notfound
         Accept: application/json
 
-        EXPECTED_RESPONSE_STATUS: 404
+        EXPECTED_RESPONSE_STATUS 404
         """)]
     public async Task Parse_Status_Assertions(string content)
     {
@@ -39,22 +39,27 @@ public class AssertionsTests
         await Assert
             .That(first.Assertions.ExpectedStatusCode)
             .IsEqualTo(404);
+
+        await Assert
+            .That(first.Assertions.ExpectedHeaders)
+            .IsEmpty();
     }
+
     [Test]
     [Arguments(
         """
         GET https://localhost/notfound
         Accept: application/json
-        EXPECTED_RESPONSE_HEADER: content-type: application/json
-        EXPECTED_RESPONSE_HEADER: x-custom-header: custom value
+        EXPECTED_RESPONSE_HEADER content-type: application/json
+        EXPECTED_RESPONSE_HEADER x-custom-header: custom value
         """)]
     [Arguments(
         """
         GET https://localhost/notfound
         Accept: application/json
-        
-        EXPECTED_RESPONSE_HEADER: content-type: application/json
-        EXPECTED_RESPONSE_HEADER: x-custom-header: custom value
+
+        EXPECTED_RESPONSE_HEADER content-type: application/json
+        EXPECTED_RESPONSE_HEADER x-custom-header: custom value
         """)]
     public async Task Parse_Header_Assertions(string content)
     {
