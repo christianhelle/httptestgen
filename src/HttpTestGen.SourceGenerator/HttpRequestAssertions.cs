@@ -5,5 +5,5 @@ namespace HttpTestGen.SourceGenerator;
 public class HttpRequestAssertions
 {
     public int ExpectedStatusCode { get; set; } = 200;
-    public StringDictionary ExpectedHeaders { get; set; } = [];
+    public Dictionary<string,string> ExpectedHeaders { get; set; } = [];
 }
