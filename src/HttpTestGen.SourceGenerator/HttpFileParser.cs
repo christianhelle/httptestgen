@@ -67,7 +67,7 @@ public class HttpFileParser
                 if (line.StartsWith("#"))
                     continue;
 
-                if (line.StartsWith("EXPECTED_STATUS", StringComparison.OrdinalIgnoreCase))
+                if (line.StartsWith("EXPECTED_RESPONSE_STATUS", StringComparison.OrdinalIgnoreCase))
                 {
                     var split = line.Split(':');
                     if (split.Length == 2)
@@ -77,7 +77,7 @@ public class HttpFileParser
                     }
                 }
 
-                if (line.StartsWith("EXPECTED_HEADERS", StringComparison.OrdinalIgnoreCase))
+                if (line.StartsWith("EXPECTED_RESPONSE_HEADER", StringComparison.OrdinalIgnoreCase))
                 {
                     var split = line.Split(':');
                     if (split.Length == 3) 
