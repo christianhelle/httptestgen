@@ -1,11 +1,9 @@
-using Xunit;
-
 namespace HttpTestGen.SourceGenerator.Tests.Parser;
 
 public class MultipleRequestTests
 {
-    [Theory]
-    [InlineData(
+    [Test]
+    [Arguments(
         """
         GET https://localhost/ HTTP/1.1
         #
@@ -14,7 +12,7 @@ public class MultipleRequestTests
         #
         """
     )]
-    [InlineData(
+    [Arguments(
         """
         GET https://localhost/ HTTP/1.1
         ##
@@ -23,7 +21,7 @@ public class MultipleRequestTests
         ###
         """
     )]
-    [InlineData(
+    [Arguments(
         """
         GET https://localhost/ HTTP/1.1
         #
@@ -33,7 +31,7 @@ public class MultipleRequestTests
         #
         """
     )]
-    [InlineData(
+    [Arguments(
         """
         #
         GET https://localhost/
@@ -42,17 +40,17 @@ public class MultipleRequestTests
         GET https://localhost/foo
         """
     )]
-    public void Parse_Multiple_Request(string content)
+    public async Task Parse_Multiple_Request(string content)
     {
         var sut = new HttpFileParser();
         var requests = sut.Parse(content).ToList();
 
         var first = requests.First();
-        Assert.Equal("GET", first.Method);
-        Assert.Equal("https://localhost/", first.Endpoint);
+        await Assert.That(first.Method).IsEqualTo("GET");
+        await Assert.That(first.Endpoint).IsEqualTo("https://localhost/");
 
         var second = requests.Skip(1).First();
-        Assert.Equal("GET", second.Method);
-        Assert.Equal("https://localhost/foo", second.Endpoint);
+        await Assert.That(second.Method).IsEqualTo("GET");
+        await Assert.That(second.Endpoint).IsEqualTo("https://localhost/foo");
     }
 }

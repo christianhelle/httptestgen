@@ -1,11 +1,11 @@
-using Xunit;
+
 
 namespace HttpTestGen.SourceGenerator.Tests.Parser;
 
 public class RequestBodyTests
 {
-    [Theory]
-    [InlineData(
+    [Test]
+    [Arguments(
         """
         GET https://localhost/ HTTP/1.1
         Accept: application/json
@@ -18,7 +18,7 @@ public class RequestBodyTests
         }
         """
     )]
-    [InlineData(
+    [Arguments(
         """
         GET https://localhost/ HTTP/1.1
         Accept: application/json
@@ -32,7 +32,7 @@ public class RequestBodyTests
         }
         """
     )]
-    [InlineData(
+    [Arguments(
         """
         GET https://localhost/ HTTP/1.1
         Accept: application/json
@@ -47,7 +47,7 @@ public class RequestBodyTests
 
         """
     )]
-    [InlineData(
+    [Arguments(
         """
         #
         GET https://localhost/ HTTP/1.1
@@ -62,7 +62,7 @@ public class RequestBodyTests
         }
         """
     )]
-    [InlineData(
+    [Arguments(
         """
         ##
         #
@@ -78,7 +78,7 @@ public class RequestBodyTests
         }
         """
     )]
-    [InlineData(
+    [Arguments(
         """
         GET https://localhost/ HTTP/1.1
         Accept: application/json
@@ -94,7 +94,7 @@ public class RequestBodyTests
         #
         """
     )]
-    [InlineData(
+    [Arguments(
         """
         #
 
@@ -113,15 +113,15 @@ public class RequestBodyTests
         #
         """
     )]
-    public void Parse_Body_Request(string content)
+    public async Task Parse_Body_Request(string content)
     {
         var sut = new HttpFileParser();
         var requests = sut.Parse(content).ToList();
 
         var first = requests.Single();
-        Assert.Equal("GET", first.Method);
-        Assert.Equal("https://localhost/", first.Endpoint);
-        Assert.NotNull(first.RequestBody);
-        Assert.False(string.IsNullOrWhiteSpace(first.RequestBody));
+        await Assert.That(first.Method).IsEqualTo("GET");
+        await Assert.That(first.Endpoint).IsEqualTo("https://localhost/");
+        await Assert.That(first.RequestBody).IsNotNull();
+        await Assert.That(first.RequestBody).IsNotNullOrWhitespace();
     }
 }
