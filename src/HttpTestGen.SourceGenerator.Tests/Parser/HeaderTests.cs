@@ -47,7 +47,6 @@ public class HeaderTests
         var first = requests.Single();
         await Assert.That(first.Method).IsEqualTo("GET");
         await Assert.That(first.Endpoint).IsEqualTo("https://localhost/");
-        await Assert.That(first.Headers.ContainsKey("Accept")).IsTrue();
         await Assert.That(first.Headers["Accept"]).IsEqualTo("application/json");
         await Assert.That(first.Headers["Authorization"]).IsEqualTo("Bearer token");
         await Assert.That(first.Headers["x-custom-header"]).IsEqualTo("custom value");
