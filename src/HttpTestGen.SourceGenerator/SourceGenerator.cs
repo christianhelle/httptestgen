@@ -11,10 +11,11 @@ public class SourceGenerator : IIncrementalGenerator
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var httpFiles = context.AdditionalTextsProvider.Where(static file => file.Path.EndsWith(".http"));
-        var namesAndContents = httpFiles.Select((text, cancellationToken) =>
-        (
-            name: Path.GetFileNameWithoutExtension(text.Path),
-            content: text.GetText(cancellationToken)!.ToString())
+        var namesAndContents = httpFiles.Select(
+            (text, cancellationToken) =>
+            (
+                name: Path.GetFileNameWithoutExtension(text.Path),
+                content: text.GetText(cancellationToken)!.ToString())
         );
 
         HttpFileParser httpFileParser = new();
@@ -51,9 +52,13 @@ public class SourceGenerator : IIncrementalGenerator
             sb.AppendLine("    {");
             sb.AppendLine("        var sut = new System.Net.Http.HttpClient();");
             sb.AppendLine($"        var response = await sut.{method}Async(\"{request.Endpoint}\");");
-            sb.AppendLine("        Xunit.Assert.True(response.IsSuccessStatusCode);");
+            sb.AppendLine(
+                request.Assertions.ExpectedStatusCode != 200
+                    ? $"        Xunit.Assert.Equal({request.Assertions.ExpectedStatusCode}, (int)response.StatusCode);"
+                    : "        Xunit.Assert.True(response.IsSuccessStatusCode);");
             sb.AppendLine("    }");
         }
+
         sb.AppendLine("}");
 
         sourceProductionContext.AddSource(
