@@ -53,14 +53,14 @@ public class HttpFileParser
                 continue;
             }
 
-            if (line.Contains("EXPECTED_RESPONSE_STATUS") && httpFileRequest is not null)
+            if (line.StartsWith("EXPECTED_RESPONSE_STATUS") && httpFileRequest is not null)
             {
                 var value = line.Split(' ')[1].Trim();
                 httpFileRequest!.Assertions.ExpectedStatusCode = int.Parse(value);
                 continue;
             }
 
-            if (line.Contains("EXPECTED_RESPONSE_HEADER") && httpFileRequest is not null)
+            if (line.StartsWith("EXPECTED_RESPONSE_HEADER") && httpFileRequest is not null)
             {
                 var header = line.Substring("EXPECTED_RESPONSE_HEADER".Length).Trim();
                 var headerParts = header.Split(':');
