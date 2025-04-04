@@ -54,8 +54,23 @@ public class HttpFileParser
                 {
                     break;
                 }
+
                 body.Append(lines[j]);
                 i++;
+            }
+
+            var assertions = new HttpRequestAssertions();
+            if (lines[i]
+                .StartsWith(
+                    "EXPECTED_STATUS",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                var split = lines[i].Split(':');
+                if (split.Length == 2)
+                {
+                    if (int.TryParse(split[1], out var statusCode))
+                        assertions.ExpectedStatusCode = statusCode;
+                }
             }
 
             yield return new HttpFileRequest
@@ -64,6 +79,7 @@ public class HttpFileParser
                 Endpoint = endpoint.Trim(),
                 Headers = headers,
                 RequestBody = body.ToString().Trim(),
+                Assertions = assertions
             };
         }
     }
