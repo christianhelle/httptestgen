@@ -56,6 +56,11 @@ public class SourceGenerator : IIncrementalGenerator
                 request.Assertions.ExpectedStatusCode != 200
                     ? $"        Xunit.Assert.Equal({request.Assertions.ExpectedStatusCode}, (int)response.StatusCode);"
                     : "        Xunit.Assert.True(response.IsSuccessStatusCode);");
+            foreach (var kvp in request.Assertions.ExpectedHeaders)
+            {
+                sb.AppendLine(
+                    $"        Xunit.Assert.True(response.Headers.GetValues(\"{kvp.Key}\").Contains(\"{kvp.Value}\"));");
+            }
             sb.AppendLine("    }");
         }
 
