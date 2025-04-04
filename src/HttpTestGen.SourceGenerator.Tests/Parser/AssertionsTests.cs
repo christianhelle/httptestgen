@@ -1,4 +1,6 @@
-﻿namespace HttpTestGen.SourceGenerator.Tests.Parser;
+﻿using FluentAssertions;
+
+namespace HttpTestGen.SourceGenerator.Tests.Parser;
 
 public class AssertionsTests
 {
@@ -27,7 +29,7 @@ public class AssertionsTests
 
         EXPECTED_STATUS: 404
         """)]
-    public async Task Parse_Assertions(string content)
+    public async Task Parse_Status_Assertions(string content)
     {
         var sut = new HttpFileParser();
         var requests = sut.Parse(content).ToList();
@@ -43,14 +45,16 @@ public class AssertionsTests
         """
         GET https://localhost/notfound
         Accept: application/json
-        EXPECTED_STATUS: 404
+        EXPECTED_HEADERS: content-type: application/json
+        EXPECTED_HEADERS: x-custom-header: custom value
         """)]
     [Arguments(
         """
         GET https://localhost/notfound
         Accept: application/json
-
-        EXPECTED_STATUS: 404
+        
+        EXPECTED_HEADERS: content-type: application/json
+        EXPECTED_HEADERS: x-custom-header: custom value
         """)]
     public async Task Parse_Header_Assertions(string content)
     {
@@ -72,7 +76,16 @@ public class AssertionsTests
             .That(first.Headers["Accept"])
             .IsEqualTo("application/json");
         await Assert
-            .That(first.Assertions.ExpectedStatusCode)
-            .IsEqualTo(404);
+            .That(first.Assertions.ExpectedHeaders.ContainsKey("x-custom-header"))
+            .IsTrue();
+        await Assert
+            .That(first.Assertions.ExpectedHeaders["x-custom-header"])
+            .IsEqualTo("custom value");
+        await Assert
+            .That(first.Assertions.ExpectedHeaders.ContainsKey("content-type"))
+            .IsTrue();
+        await Assert
+            .That(first.Assertions.ExpectedHeaders["content-type"])
+            .IsEqualTo("application/json");
     }
 }

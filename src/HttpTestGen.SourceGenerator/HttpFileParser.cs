@@ -10,7 +10,7 @@ public class HttpFileParser
         var lines = content.Split('\n');
         for (int i = 0; i < lines.Length; i++)
         {
-            string line = lines[i].Trim();
+            var line = lines[i].Trim();
             if (line.StartsWith("#"))
             {
                 continue;
@@ -24,6 +24,7 @@ public class HttpFileParser
                 continue;
             }
 
+            var requestStartIndex = i;
             var method = requestLine[0];
             var endpoint = requestLine[1];
 
@@ -60,16 +61,27 @@ public class HttpFileParser
             }
 
             var assertions = new HttpRequestAssertions();
-            if (lines[i]
-                .StartsWith(
-                    "EXPECTED_STATUS",
-                    StringComparison.OrdinalIgnoreCase))
+            for (var j = requestStartIndex + 1; j < lines.Length; j++)
             {
-                var split = lines[i].Split(':');
-                if (split.Length == 2)
+                line = lines[j];
+                if (line.StartsWith("#"))
+                    continue;
+
+                if (line.StartsWith("EXPECTED_STATUS", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (int.TryParse(split[1], out var statusCode))
-                        assertions.ExpectedStatusCode = statusCode;
+                    var split = line.Split(':');
+                    if (split.Length == 2)
+                    {
+                        if (int.TryParse(split[1], out var statusCode))
+                            assertions.ExpectedStatusCode = statusCode;
+                    }
+                }
+
+                if (line.StartsWith("EXPECTED_HEADERS", StringComparison.OrdinalIgnoreCase))
+                {
+                    var split = line.Split(':');
+                    if (split.Length == 3) 
+                        assertions.ExpectedHeaders[split[1].Trim()] = split[2].Trim();
                 }
             }
 
