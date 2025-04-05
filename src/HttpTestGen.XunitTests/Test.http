@@ -1,0 +1,21 @@
+GET https://google.com
+
+#
+GET https://youtube.com
+
+#
+GET https://x.com
+
+#
+GET https://facebook.com
+
+#
+GET https://webhook.site/c8993df6-0ed2-42b6-b540-7033c5c12aed
+
+#
+GET https://webhook.site/c8993df6-0ed2-42b6-b540-7033c5c12aed
+
+#
+GET https://google.com/notfound
+
+EXPECTED_RESPONSE_STATUS 404
