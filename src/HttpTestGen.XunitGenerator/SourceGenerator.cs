@@ -41,7 +41,5 @@ public class SourceGenerator : IIncrementalGenerator
             new XunitTestGenerator()
                 .Generate(
                     httpFilename,
-                    httpFileParser
-                        .Parse(httpFileContents)
-                        .ToList()));
+                    [.. httpFileParser.Parse(httpFileContents)]));
 }

@@ -1,7 +1,4 @@
 <Solution>
-  <Folder Name="/HttpTestGen.TUnitTests/">
-    <Project Path="HttpTestGen.TUnitTests/HttpTestGen.Tests.csproj" />
-  </Folder>
   <Folder Name="/Source/">
     <Project Path="HttpTestGen.Core/HttpTestGen.Core.csproj" />
     <Project Path="HttpTestGen.TUnitGenerator/HttpTestGen.TUnitGenerator.csproj" />

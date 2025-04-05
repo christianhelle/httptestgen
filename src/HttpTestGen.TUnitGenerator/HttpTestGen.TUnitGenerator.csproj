@@ -8,10 +8,14 @@
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <RootNamespace>HttpTestGen.TUnitGenerator</RootNamespace>
   </PropertyGroup>
-  
+
   <ItemGroup>
-    <Compile Include="../HttpTestGen.Core/Parser/*.cs" />
-    <Compile Include="../HttpTestGen.Core/*.cs" />
+    <Compile Include="..\HttpTestGen.Core\ITestGenerator.cs" Link="Core\ITestGenerator.cs" />
+    <Compile Include="..\HttpTestGen.Core\Parser\HttpFileAssertions.cs" Link="Core\HttpFileAssertions.cs" />
+    <Compile Include="..\HttpTestGen.Core\Parser\HttpFileParser.cs" Link="Core\HttpFileParser.cs" />
+    <Compile Include="..\HttpTestGen.Core\Parser\HttpFileRequest.cs" Link="Core\HttpFileRequest.cs" />
+    <Compile Include="..\HttpTestGen.Core\TestGenerator.cs" Link="Core\TestGenerator.cs" />
+    <Compile Include="..\HttpTestGen.Core\TUnitTestGenerator.cs" Link="Core\TUnitTestGenerator.cs" />
   </ItemGroup>
 
   <ItemGroup>
