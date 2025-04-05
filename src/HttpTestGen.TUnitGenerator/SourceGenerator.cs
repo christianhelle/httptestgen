@@ -25,14 +25,15 @@ public class SourceGenerator : IIncrementalGenerator
         );
 
         HttpFileParser httpFileParser = new();
+        TUnitTestGenerator generator = new();
+
         context.RegisterSourceOutput(
             files,
             (context, file) =>
             {
-                var code = new TUnitTestGenerator()
-                    .Generate(
-                        file.name,
-                        [.. httpFileParser.Parse(file.content)]);
+                var code = generator.Generate(
+                    file.name,
+                    [.. httpFileParser.Parse(file.content)]);
 
                 var folder = Path.GetDirectoryName(file.path)!;
                 var fileName = Path.Combine(folder, $"{file.name}.http.cs");
