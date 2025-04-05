@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using HttpTestGen.Core;
+﻿using HttpTestGen.Core;
 
 namespace HttpTestGen.Core.Tests.Parser;
 
