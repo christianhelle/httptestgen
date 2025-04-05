@@ -1,6 +1,6 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using HttpTestGen.Core;
+using Microsoft.CodeAnalysis;
 using System.Diagnostics.CodeAnalysis;
-using HttpTestGen.Core;
 
 namespace HttpTestGen.TUnitGenerator;
 
@@ -8,38 +8,35 @@ namespace HttpTestGen.TUnitGenerator;
 [Generator(LanguageNames.CSharp)]
 public class SourceGenerator : IIncrementalGenerator
 {
+    [SuppressMessage(
+        "MicrosoftCodeAnalysisCorrectness",
+        "RS1035:Do not use APIs banned for analyzers",
+        Justification = "TUnit uses source generators and it's not possible to chain them")]
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var httpFiles = context.AdditionalTextsProvider.Where(static file => file.Path.EndsWith(".http"));
-        var namesAndContents = httpFiles.Select(
+        var files = httpFiles.Select(
             (text, cancellationToken) =>
             (
+                path: text.Path,
                 name: Path.GetFileNameWithoutExtension(text.Path),
-                content: text.GetText(cancellationToken)!.ToString())
+                content: text.GetText(cancellationToken)!.ToString()
+            )
         );
 
         HttpFileParser httpFileParser = new();
         context.RegisterSourceOutput(
-            namesAndContents,
-            (sourceProductionContext, nameAndContent) =>
+            files,
+            (context, file) =>
             {
-                GenerateHttpTests(
-                    sourceProductionContext,
-                    nameAndContent.name,
-                    nameAndContent.content,
-                    httpFileParser);
+                var code = new TUnitTestGenerator()
+                    .Generate(
+                        file.name,
+                        [.. httpFileParser.Parse(file.content)]);
+
+                var folder = Path.GetDirectoryName(file.path)!;
+                var fileName = Path.Combine(folder, $"{file.name}.http.cs");
+                File.WriteAllText(fileName, code);
             });
     }
-
-    private static void GenerateHttpTests(
-        SourceProductionContext sourceProductionContext,
-        string httpFilename,
-        string httpFileContents,
-        HttpFileParser httpFileParser) =>
-        sourceProductionContext.AddSource(
-            $"{httpFilename}.TUnit.http",
-            new TUnitTestGenerator()
-                .Generate(
-                    httpFilename,
-                    [.. httpFileParser.Parse(httpFileContents)]));
 }
