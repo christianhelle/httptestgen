@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-    <RootNamespace>HttpTestGen.XunitGenerator</RootNamespace>
+    <RootNamespace>HttpTestGen.TUnitGenerator</RootNamespace>
   </PropertyGroup>
   
   <ItemGroup>

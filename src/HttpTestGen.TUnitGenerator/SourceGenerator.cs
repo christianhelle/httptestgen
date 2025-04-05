@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using HttpTestGen.Core;
 
-namespace HttpTestGen.XunitGenerator;
+namespace HttpTestGen.TUnitGenerator;
 
 [ExcludeFromCodeCoverage]
 [Generator(LanguageNames.CSharp)]
@@ -37,8 +37,8 @@ public class SourceGenerator : IIncrementalGenerator
         string httpFileContents,
         HttpFileParser httpFileParser) =>
         sourceProductionContext.AddSource(
-            $"{httpFilename}.Xunit.http",
-            new XunitTestGenerator()
+            $"{httpFilename}.TUnit.http",
+            new TUnitTestGenerator()
                 .Generate(
                     httpFilename,
                     httpFileParser
