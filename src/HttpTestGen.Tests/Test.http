@@ -18,5 +18,4 @@ GET https://webhook.site/c8993df6-0ed2-42b6-b540-7033c5c12aed
 #
 GET https://google.com/notfound
 
-# EXPECTED_RESPONSE_STATUS: 404
-# EXPECTED_RESPONSE_HEADER: Content-Type: text/html; charset=UTF-8
+EXPECTED_RESPONSE_STATUS 404

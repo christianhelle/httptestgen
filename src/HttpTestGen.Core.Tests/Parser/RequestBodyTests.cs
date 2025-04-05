@@ -1,6 +1,8 @@
 
 
-namespace HttpTestGen.SourceGenerator.Tests.Parser;
+using HttpTestGen.Core;
+
+namespace HttpTestGen.Core.Tests.Parser;
 
 public class RequestBodyTests
 {

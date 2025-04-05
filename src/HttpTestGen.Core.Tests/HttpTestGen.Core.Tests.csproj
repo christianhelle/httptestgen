@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\HttpTestGen.SourceGenerator\HttpTestGen.SourceGenerator.csproj" />
+    <ProjectReference Include="..\HttpTestGen.XunitGenerator\HttpTestGen.XunitGenerator.csproj" />
   </ItemGroup>
 
 </Project>

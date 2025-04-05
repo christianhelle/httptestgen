@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
+using HttpTestGen.Core;
 
-namespace HttpTestGen.SourceGenerator.Tests.Parser;
+namespace HttpTestGen.Core.Tests.Parser;
 
 public class AssertionsTests
 {
