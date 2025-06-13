@@ -1,0 +1,39 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+        
+    - name: Restore dependencies
+      run: |
+        dotnet restore src/HttpTestGen.Core/HttpTestGen.Core.csproj
+        dotnet restore src/HttpTestGen.TUnitGenerator/HttpTestGen.TUnitGenerator.csproj
+        dotnet restore src/HttpTestGen.XunitGenerator/HttpTestGen.XunitGenerator.csproj
+        
+    - name: Build and pack
+      run: |
+        dotnet pack src/HttpTestGen.Core/HttpTestGen.Core.csproj --configuration Release --no-restore --output nupkgs
+        dotnet pack src/HttpTestGen.TUnitGenerator/HttpTestGen.TUnitGenerator.csproj --configuration Release --no-restore --output nupkgs
+        dotnet pack src/HttpTestGen.XunitGenerator/HttpTestGen.XunitGenerator.csproj --configuration Release --no-restore --output nupkgs
+        
+    - name: Upload packages
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget-packages
+        path: nupkgs/*.nupkg
+        
+    - name: Publish to NuGet
+      run: dotnet nuget push nupkgs/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+      if: github.event_name == 'release'
