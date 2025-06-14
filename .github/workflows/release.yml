@@ -17,10 +17,7 @@ jobs:
         dotnet-version: '9.0.x'
         
     - name: Restore dependencies
-      run: |
-        dotnet restore src/HttpTestGen.Core/HttpTestGen.Core.csproj
-        dotnet restore src/HttpTestGen.TUnitGenerator/HttpTestGen.TUnitGenerator.csproj
-        dotnet restore src/HttpTestGen.XunitGenerator/HttpTestGen.XunitGenerator.csproj
+      run: dotnet restore
         
     - name: Build and pack
       run: |

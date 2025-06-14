@@ -18,23 +18,11 @@ jobs:
       with:
         dotnet-version: '9.0.x'
         
-    - name: Restore all dependencies
-      run: |
-        dotnet restore src/HttpTestGen.Core/HttpTestGen.Core.csproj
-        dotnet restore src/HttpTestGen.TUnitGenerator/HttpTestGen.TUnitGenerator.csproj
-        dotnet restore src/HttpTestGen.XunitGenerator/HttpTestGen.XunitGenerator.csproj
-        dotnet restore src/HttpTestGen.Core.Tests/HttpTestGen.Core.Tests.csproj
-        dotnet restore src/HttpTestGen.TUnitTests/HttpTestGen.TUnitTests.csproj
-        dotnet restore src/HttpTestGen.XunitTests/HttpTestGen.XunitTests.csproj
+    - name: Restore dependencies
+      run: dotnet restore
         
-    - name: Build all projects
-      run: |
-        dotnet build src/HttpTestGen.Core/HttpTestGen.Core.csproj --no-restore --configuration Release
-        dotnet build src/HttpTestGen.TUnitGenerator/HttpTestGen.TUnitGenerator.csproj --no-restore --configuration Release
-        dotnet build src/HttpTestGen.XunitGenerator/HttpTestGen.XunitGenerator.csproj --no-restore --configuration Release
-        dotnet build src/HttpTestGen.Core.Tests/HttpTestGen.Core.Tests.csproj --no-restore --configuration Release
-        dotnet build src/HttpTestGen.TUnitTests/HttpTestGen.TUnitTests.csproj --no-restore --configuration Release
-        dotnet build src/HttpTestGen.XunitTests/HttpTestGen.XunitTests.csproj --no-restore --configuration Release
+    - name: Build solution
+      run: dotnet build --no-restore --configuration Release
         
     - name: Run tests
       run: |
