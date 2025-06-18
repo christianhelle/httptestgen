@@ -5,6 +5,32 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
+    
+    <!-- NuGet Package Information -->
+    <PackageId>HttpTestGen.Core</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Christian Helle</Authors>
+    <Company>Christian Helle</Company>
+    <Product>HttpTestGen</Product>
+    <Description>Core library for HttpTestGen - A .NET source generator that converts .http files into C# test code. Contains the base functionality for parsing HTTP files and generating test code.</Description>
+    <PackageTags>http;testing;source-generator;api-testing;integration-testing;dotnet</PackageTags>
+    <PackageProjectUrl>https://github.com/christianhelle/httptestgen</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/christianhelle/httptestgen</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
+    <Copyright>Copyright © Christian Helle 2025</Copyright>
+    
+    <!-- Include symbols for better debugging -->
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\images\nuget-icon.png" Pack="true" PackagePath="icon.png" Condition="Exists('..\..\images\nuget-icon.png')" />
+  </ItemGroup>
 
 </Project>
