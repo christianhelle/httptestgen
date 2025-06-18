@@ -7,6 +7,31 @@
     <LangVersion>latest</LangVersion>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <RootNamespace>HttpTestGen.XunitGenerator</RootNamespace>
+    
+    <!-- NuGet Package Information -->
+    <PackageId>HttpTestGen.XunitGenerator</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Christian Helle</Authors>
+    <Company>Christian Helle</Company>
+    <Product>HttpTestGen</Product>
+    <Description>A .NET source generator that converts .http files into xUnit test code. Automatically generates fully functional xUnit tests from HTTP requests at compile time.</Description>
+    <PackageTags>http;testing;source-generator;xunit;api-testing;integration-testing;dotnet;analyzers</PackageTags>
+    <PackageProjectUrl>https://github.com/christianhelle/httptestgen</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/christianhelle/httptestgen</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
+    <Copyright>Copyright © Christian Helle 2025</Copyright>
+    
+    <!-- Include symbols for better debugging -->
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    
+    <!-- Source Generator specific properties -->
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <DevelopmentDependency>true</DevelopmentDependency>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,13 +43,24 @@
     <Compile Include="..\HttpTestGen.Core\XunitTestGenerator.cs" Link="Core\XunitTestGenerator.cs" />
   </ItemGroup>
 
-
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="4.14.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\images\nuget-icon.png" Pack="true" PackagePath="icon.png" Condition="Exists('..\..\images\nuget-icon.png')" />
+    <None Include="tools\install.ps1" Pack="true" PackagePath="tools\install.ps1" Condition="Exists('tools\install.ps1')" />
+    <None Include="tools\uninstall.ps1" Pack="true" PackagePath="tools\uninstall.ps1" Condition="Exists('tools\uninstall.ps1')" />
+  </ItemGroup>
+
+  <!-- Include the generator in the analyzers folder -->
+  <ItemGroup>
+    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers\dotnet\cs\$(AssemblyName).dll" Visible="false" />
   </ItemGroup>
 
 </Project>
