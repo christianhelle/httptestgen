@@ -60,7 +60,7 @@
 
   <!-- Include the generator in the analyzers folder -->
   <ItemGroup>
-    <Analyzer Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers\dotnet\cs\$(AssemblyName).dll" Visible="false" />
+    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers\dotnet\cs\$(AssemblyName).dll" Visible="false" />
   </ItemGroup>
 
 </Project>
