@@ -1,15 +1,28 @@
 name: Release
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Extract version from tag
+      id: version
+      run: |
+        TAG_NAME=${GITHUB_REF#refs/tags/}
+        VERSION=${TAG_NAME#v}
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "tag=$TAG_NAME" >> $GITHUB_OUTPUT
     
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
@@ -21,9 +34,9 @@ jobs:
         
     - name: Build and pack
       run: |
-        dotnet pack src/HttpTestGen.Core/HttpTestGen.Core.csproj --configuration Release --no-restore --output nupkgs
-        dotnet pack src/HttpTestGen.TUnitGenerator/HttpTestGen.TUnitGenerator.csproj --configuration Release --no-restore --output nupkgs
-        dotnet pack src/HttpTestGen.XunitGenerator/HttpTestGen.XunitGenerator.csproj --configuration Release --no-restore --output nupkgs
+        dotnet pack src/HttpTestGen.Core/HttpTestGen.Core.csproj --configuration Release --no-restore --output nupkgs /p:Version=${{ steps.version.outputs.version }}
+        dotnet pack src/HttpTestGen.TUnitGenerator/HttpTestGen.TUnitGenerator.csproj --configuration Release --no-restore --output nupkgs /p:Version=${{ steps.version.outputs.version }}
+        dotnet pack src/HttpTestGen.XunitGenerator/HttpTestGen.XunitGenerator.csproj --configuration Release --no-restore --output nupkgs /p:Version=${{ steps.version.outputs.version }}
         
     - name: Upload packages
       uses: actions/upload-artifact@v4
@@ -32,5 +45,37 @@ jobs:
         path: nupkgs/*.nupkg
         
     - name: Publish to NuGet
-      run: dotnet nuget push nupkgs/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
-      if: github.event_name == 'release'
+      run: dotnet nuget push nupkgs/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      
+    - name: Generate release notes
+      id: release_notes
+      run: |
+        # Get the previous tag
+        PREVIOUS_TAG=$(git tag --sort=-version:refname | grep -v "^${{ steps.version.outputs.tag }}$" | head -n 1)
+        
+        # Generate release notes from commits
+        if [ -n "$PREVIOUS_TAG" ]; then
+          RELEASE_NOTES=$(git log --pretty=format:"- %s (%h)" $PREVIOUS_TAG..${{ steps.version.outputs.tag }})
+        else
+          RELEASE_NOTES=$(git log --pretty=format:"- %s (%h)")
+        fi
+        
+        # Create release notes file
+        cat > release_notes.md << EOF
+        ## What's Changed
+        
+        $RELEASE_NOTES
+        
+        **Full Changelog**: https://github.com/${{ github.repository }}/compare/$PREVIOUS_TAG...${{ steps.version.outputs.tag }}
+        EOF
+        
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.version.outputs.tag }}
+        release_name: Release ${{ steps.version.outputs.version }}
+        body_path: release_notes.md
+        draft: false
+        prerelease: false
