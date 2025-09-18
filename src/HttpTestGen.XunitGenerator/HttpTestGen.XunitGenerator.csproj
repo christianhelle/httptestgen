@@ -26,6 +26,7 @@
     <Copyright>Copyright © Christian Helle 2025</Copyright>
     
     <!-- Include symbols for better debugging -->
+    <IncludeSource>true</IncludeSource>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     
