@@ -392,13 +392,3 @@ A: Check that your HTTP syntax is valid and all required NuGet packages are inst
 
 **Q: Tests fail with connection errors**
 A: Verify that the target APIs are accessible from your test environment.
-
-### Getting Help
-- 📚 [Documentation](https://github.com/christianhelle/httptestgen)
-- 🐛 [Report Issues](https://github.com/christianhelle/httptestgen/issues)
-- 💬 [Discussions](https://github.com/christianhelle/httptestgen/discussions)
-
----
-
-**Made with ❤️ for the .NET community**
-
