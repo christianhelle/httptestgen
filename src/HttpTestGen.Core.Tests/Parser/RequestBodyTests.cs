@@ -124,6 +124,6 @@ public class RequestBodyTests
         await Assert.That(first.Method).IsEqualTo("GET");
         await Assert.That(first.Endpoint).IsEqualTo("https://localhost/");
         await Assert.That(first.RequestBody).IsNotNull();
-        await Assert.That(first.RequestBody).IsNotNullOrWhitespace();
+        await Assert.That(!string.IsNullOrWhiteSpace(first.RequestBody)).IsTrue();
     }
 }
