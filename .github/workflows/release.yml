@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      id-token: write  # Required for OIDC authentication with NuGet.org
     
     steps:
     - uses: actions/checkout@v5
@@ -47,7 +48,11 @@ jobs:
         path: nupkgs/*.nupkg
         
     - name: Publish to NuGet
-      run: dotnet nuget push nupkgs/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      # Uses Trusted Publishing with OIDC authentication (no API key required)
+      # Repository must be configured on NuGet.org with Trusted Publishers settings:
+      # - Subject identifier: repo:christianhelle/httptestgen:ref:refs/tags/v*
+      # Documentation: https://learn.microsoft.com/en-us/nuget/nuget-org/trusted-publishing
+      run: dotnet nuget push nupkgs/*.nupkg --source https://api.nuget.org/v3/index.json --skip-duplicate
       continue-on-error: true
       
     - name: Generate release notes
