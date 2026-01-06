@@ -26,7 +26,7 @@ jobs:
         
     - name: Run tests
       run: |
-        dotnet run --project src/HttpTestGen.Core.Tests/HttpTestGen.Core.Tests.csproj --configuration Release
+        dotnet run --project src/HttpTestGen.Core.Tests/HttpTestGen.Core.Tests.csproj --configuration Release --no-build
         echo "Running integration tests (may fail due to network connectivity):"
-        dotnet run --project src/HttpTestGen.TUnitTests/HttpTestGen.TUnitTests.csproj --configuration Release || echo "TUnit integration tests failed (expected in CI environment)"
-        dotnet run --project src/HttpTestGen.XunitTests/HttpTestGen.XunitTests.csproj --configuration Release || echo "xUnit integration tests failed (expected in CI environment)"
+        dotnet run --project src/HttpTestGen.TUnitTests/HttpTestGen.TUnitTests.csproj --configuration Release --no-build || echo "TUnit integration tests failed (expected in CI environment)"
+        dotnet run --project src/HttpTestGen.XunitTests/HttpTestGen.XunitTests.csproj --configuration Release --no-build || echo "xUnit integration tests failed (expected in CI environment)"
