@@ -26,14 +26,7 @@ jobs:
         
     - name: Run tests
       run: |
-        dotnet test src/HttpTestGen.Core.Tests/HttpTestGen.Core.Tests.csproj --no-build --configuration Release --verbosity normal --logger trx --results-directory TestResults
+        dotnet run --project src/HttpTestGen.Core.Tests/HttpTestGen.Core.Tests.csproj --configuration Release
         echo "Running integration tests (may fail due to network connectivity):"
-        dotnet test src/HttpTestGen.TUnitTests/HttpTestGen.TUnitTests.csproj --no-build --configuration Release --verbosity normal --logger trx --results-directory TestResults || echo "TUnit integration tests failed (expected in CI environment)"
-        dotnet test src/HttpTestGen.XunitTests/HttpTestGen.XunitTests.csproj --no-build --configuration Release --verbosity normal --logger trx --results-directory TestResults || echo "xUnit integration tests failed (expected in CI environment)"
-        
-    - name: Upload test results
-      uses: actions/upload-artifact@v5
-      if: always()
-      with:
-        name: test-results
-        path: TestResults/*.trx
+        dotnet run --project src/HttpTestGen.TUnitTests/HttpTestGen.TUnitTests.csproj --configuration Release || echo "TUnit integration tests failed (expected in CI environment)"
+        dotnet run --project src/HttpTestGen.XunitTests/HttpTestGen.XunitTests.csproj --configuration Release || echo "xUnit integration tests failed (expected in CI environment)"
