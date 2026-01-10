@@ -24,13 +24,24 @@ public class TUnitTestGenerator : TestGenerator
         StringBuilder builder,
         int index)
     {
-        var method = GetMethod(request);
         var requestName = new Uri(request.Endpoint).Host.Replace(".", "_").ToLowerInvariant();
         builder.AppendLine("    [Test]");
-        builder.AppendLine($"    public async Task {method.ToLowerInvariant()}_{requestName}_{index}()");
+        builder.AppendLine($"    public async Task {request.Method.ToLowerInvariant()}_{requestName}_{index}()");
         builder.AppendLine("    {");
         builder.AppendLine("        var sut = new System.Net.Http.HttpClient();");
-        builder.AppendLine($"        var response = await sut.{method}Async(\"{request.Endpoint}\");");
+        
+        if (NeedsSendAsync(request))
+        {
+            var httpMethodName = GetHttpMethodName(request);
+            builder.AppendLine($"        var request = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.{httpMethodName}, \"{request.Endpoint}\");");
+            builder.AppendLine("        var response = await sut.SendAsync(request);");
+        }
+        else
+        {
+            var httpMethod = GetMethod(request);
+            builder.AppendLine($"        var response = await sut.{httpMethod}Async(\"{request.Endpoint}\");");
+        }
+        
         builder.AppendLine(
             request.Assertions.ExpectedStatusCode != 200
                 ? $"        await Assert.That((int)response.StatusCode).IsEqualTo({request.Assertions.ExpectedStatusCode});"
