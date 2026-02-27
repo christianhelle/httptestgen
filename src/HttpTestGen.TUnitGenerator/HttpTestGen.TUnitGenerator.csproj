@@ -38,8 +38,13 @@
   <ItemGroup>
     <Compile Include="..\HttpTestGen.Core\ITestGenerator.cs" Link="Core\ITestGenerator.cs" />
     <Compile Include="..\HttpTestGen.Core\Parser\HttpFileAssertions.cs" Link="Core\HttpFileAssertions.cs" />
+    <Compile Include="..\HttpTestGen.Core\Parser\HttpFileCondition.cs" Link="Core\HttpFileCondition.cs" />
     <Compile Include="..\HttpTestGen.Core\Parser\HttpFileParser.cs" Link="Core\HttpFileParser.cs" />
     <Compile Include="..\HttpTestGen.Core\Parser\HttpFileRequest.cs" Link="Core\HttpFileRequest.cs" />
+    <Compile Include="..\HttpTestGen.Core\Parser\HttpFileVariable.cs" Link="Core\HttpFileVariable.cs" />
+    <Compile Include="..\HttpTestGen.Core\Parser\TimeoutParser.cs" Link="Core\TimeoutParser.cs" />
+    <Compile Include="..\HttpTestGen.Core\Functions\FunctionSubstitutor.cs" Link="Core\FunctionSubstitutor.cs" />
+    <Compile Include="..\HttpTestGen.Core\Functions\VariableSubstitutor.cs" Link="Core\VariableSubstitutor.cs" />
     <Compile Include="..\HttpTestGen.Core\TestGenerator.cs" Link="Core\TestGenerator.cs" />
     <Compile Include="..\HttpTestGen.Core\TUnitTestGenerator.cs" Link="Core\TUnitTestGenerator.cs" />
   </ItemGroup>

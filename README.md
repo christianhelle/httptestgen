@@ -5,13 +5,18 @@ A powerful .NET source generator that automatically converts `.http` files into 
 ## 🚀 Features
 
 - **Automatic Test Generation**: Transform `.http` files into xUnit or TUnit test code at compile time
-- **Rich HTTP Support**: Parse GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS, and TRACE methods
+- **Rich HTTP Support**: Parse GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS, TRACE, and CONNECT methods
 - **Header Processing**: Full support for HTTP headers including custom headers
 - **Request Bodies**: Support for JSON, XML, and text request bodies
-- **Response Assertions**: Validate expected status codes and response headers
+- **Response Assertions**: Validate expected status codes, response headers, and response body content
+- **Variables**: Declare and use variables with `@variable = value` and `{{variable}}` substitution
+- **Dynamic Functions**: Built-in functions for generating random data (`{{guid()}}`, `{{name()}}`, `{{email()}}`, etc.)
+- **Request Directives**: Control test behavior with `@name`, `@timeout`, `@dependsOn`, `@pre-delay`, `@post-delay`, `@if`/`@if-not`
 - **Multiple Test Frameworks**: Generate tests for xUnit and TUnit
 - **Source Generator**: Zero-runtime overhead with compile-time code generation
 - **IDE Integration**: Works seamlessly with existing `.http` files in your IDE
+- **Comment Styles**: Support for both `#` and `//` comment styles
+- **IntelliJ Compatibility**: Ignores JetBrains HTTP Client script blocks (`> {% ... %}`)
 
 ## 📦 Installation
 
@@ -67,6 +72,113 @@ EXPECTED_RESPONSE_HEADER content-type: application/json
 EXPECTED_RESPONSE_HEADER x-custom-header: custom-value
 ```
 
+### Variables
+
+Declare variables at the top of your `.http` file and reference them with `{{variable}}` syntax:
+
+```http
+@host = api.example.com
+@baseUrl = https://{{host}}/v1
+@token = my-auth-token
+
+GET {{baseUrl}}/users
+Authorization: Bearer {{token}}
+
+###
+
+POST {{baseUrl}}/users
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "John Doe"
+}
+```
+
+Variables support chaining — a variable can reference another variable that was declared earlier.
+
+### Dynamic Function Variables
+
+Use built-in functions to generate dynamic values at parse time:
+
+```http
+POST https://api.example.com/users
+Content-Type: application/json
+
+{
+  "id": "{{guid()}}",
+  "name": "{{name()}}",
+  "email": "{{email()}}",
+  "job": "{{job_title()}}",
+  "address": "{{address()}}",
+  "created": "{{getdatetime()}}"
+}
+```
+
+#### Available Functions
+
+| Function | Description | Example Output |
+|----------|-------------|----------------|
+| `{{guid()}}` | UUID v4 (32 hex chars, no hyphens) | `a1b2c3d4e5f6789012345678abcdef01` |
+| `{{string()}}` | 20-character random alphanumeric | `f47ac10b58cc4372a567` |
+| `{{number()}}` | Random integer 0–100 | `42` |
+| `{{name()}}` | Random full name | `James Smith` |
+| `{{first_name()}}` | Random first name | `Emily` |
+| `{{last_name()}}` | Random last name | `Johnson` |
+| `{{email()}}` | Random email address | `james.smith@example.com` |
+| `{{address()}}` | Random street address | `123 Main St, New York, NY 10001` |
+| `{{job_title()}}` | Random job title | `Software Engineer` |
+| `{{getdate()}}` | Current date (YYYY-MM-DD) | `2025-01-15` |
+| `{{gettime()}}` | Current time (HH:MM:SS) | `14:30:45` |
+| `{{getdatetime()}}` | Local datetime | `2025-01-15 14:30:45` |
+| `{{getutcdatetime()}}` | UTC datetime | `2025-01-15 12:30:45` |
+| `{{base64_encode('text')}}` | Base64 encode text | `dGV4dA==` |
+| `{{upper('text')}}` | Convert to uppercase | `TEXT` |
+| `{{lower('TEXT')}}` | Convert to lowercase | `text` |
+| `{{lorem_ipsum(50)}}` | Lorem ipsum (N words) | `lorem ipsum dolor sit amet...` |
+
+### Request Directives
+
+Control request behavior using directives in comments before the request line:
+
+```http
+# @name loginRequest
+# @timeout 5s
+# @pre-delay 500
+POST https://api.example.com/auth
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "secret"
+}
+
+###
+
+# @name getProfile
+# @dependsOn loginRequest
+# @if loginRequest.response.status 200
+# @timeout 10s
+# @post-delay 1000
+GET https://api.example.com/profile
+Authorization: Bearer my-token
+```
+
+#### Available Directives
+
+| Directive | Format | Description |
+|-----------|--------|-------------|
+| `@name` | `# @name requestName` | Names the request (used for test method naming and dependencies) |
+| `@timeout` | `# @timeout 5s` | Sets request timeout (supports `ms`, `s`, `m` units) |
+| `@connection-timeout` | `# @connection-timeout 3s` | Sets connection establishment timeout |
+| `@dependsOn` | `# @dependsOn requestName` | Declares dependency on another request |
+| `@if` | `# @if request.response.status 200` | Conditional execution (positive) |
+| `@if-not` | `# @if-not request.response.status 401` | Conditional execution (negative) |
+| `@pre-delay` | `# @pre-delay 500` | Delay in milliseconds before the request |
+| `@post-delay` | `# @post-delay 1000` | Delay in milliseconds after the request |
+
+All directives support both `#` and `//` comment prefixes.
+
 ### Generated Test Code
 
 The source generator automatically creates test methods from your `.http` files. For example, the above `.http` file would generate:
@@ -95,7 +207,8 @@ public class ApiTestsXunitTests
     public async Task post_api_example_com_2()
     {
         var sut = new System.Net.Http.HttpClient();
-        var response = await sut.PostAsync("https://api.example.com/users");
+        var content = new System.Net.Http.StringContent("{...}", System.Text.Encoding.UTF8, "application/json");
+        var response = await sut.PostAsync("https://api.example.com/users", content);
         Xunit.Assert.True(response.IsSuccessStatusCode);
     }
 
@@ -119,6 +232,21 @@ public class ApiTestsXunitTests
 }
 ```
 
+When `@name` is used, the test method uses the request name instead of the auto-generated pattern:
+
+```csharp
+    [Xunit.Fact]
+    public async Task loginRequest()
+    {
+        var sut = new System.Net.Http.HttpClient();
+        sut.Timeout = System.TimeSpan.FromMilliseconds(5000);
+        await System.Threading.Tasks.Task.Delay(500);
+        var content = new System.Net.Http.StringContent("{...}", System.Text.Encoding.UTF8, "application/json");
+        var response = await sut.PostAsync("https://api.example.com/auth", content);
+        Xunit.Assert.True(response.IsSuccessStatusCode);
+    }
+```
+
 ## 📋 Supported HTTP Methods
 
 - `GET` - Retrieve data
@@ -129,6 +257,7 @@ public class ApiTestsXunitTests
 - `HEAD` - Retrieve headers only
 - `OPTIONS` - Check available methods
 - `TRACE` - Diagnostic trace
+- `CONNECT` - Establish tunnel
 
 ## 🎯 Assertion Syntax
 
@@ -143,6 +272,44 @@ EXPECTED_RESPONSE_STATUS 404
 GET https://api.example.com/api/data
 EXPECTED_RESPONSE_HEADER content-type: application/json
 EXPECTED_RESPONSE_HEADER cache-control: no-cache
+```
+
+### Body Assertions
+```http
+GET https://api.example.com/health
+EXPECTED_RESPONSE_BODY "healthy"
+```
+
+### Assertion Prefix
+
+Assertions can optionally be prefixed with `> ` for compatibility with other HTTP clients:
+
+```http
+GET https://api.example.com/
+> EXPECTED_RESPONSE_STATUS 200
+> EXPECTED_RESPONSE_BODY "ok"
+> EXPECTED_RESPONSE_HEADER content-type: application/json
+```
+
+## 🏗️ Request Separators
+
+Separate multiple requests with `###` (recommended) or `#`/`##`:
+
+```http
+GET https://api.example.com/users
+
+###
+
+POST https://api.example.com/users
+Content-Type: application/json
+
+{
+  "name": "Test User"
+}
+
+###
+
+DELETE https://api.example.com/users/1
 ```
 
 ## 🏗️ Project Integration
@@ -169,33 +336,21 @@ The source generator will create corresponding test classes:
 ## 🛠️ Advanced Features
 
 ### Comments and Documentation
-Use `#` for comments in your `.http` files:
+
+Both `#` and `//` comment styles are supported:
 
 ```http
-# This is a comment
+# This is a hash comment
+// This is a double-slash comment
 GET https://api.example.com/users
 
-# Test user creation
+// Test user creation
 POST https://api.example.com/users
 Content-Type: application/json
 
 {
   "name": "Test User"
 }
-```
-
-### Multiple Requests
-Separate multiple requests with blank lines or comments:
-
-```http
-GET https://api.example.com/users
-
-# Separator comment
-GET https://api.example.com/posts
-
-#
-
-GET https://api.example.com/comments
 ```
 
 ### Request Bodies
@@ -225,6 +380,19 @@ Content-Type: text/plain
 This is plain text content
 ```
 
+### IntelliJ HTTP Client Compatibility
+
+JetBrains HTTP Client response handler scripts are automatically ignored:
+
+```http
+GET https://api.example.com/users
+> {%
+    client.test("Test", function() {
+        client.assert(response.status === 200);
+    });
+%}
+```
+
 ## 📸 Visual Examples
 
 ### Running Tests in Terminal
@@ -246,7 +414,9 @@ This is plain text content
 - **Organize by feature**: Create separate `.http` files for different API endpoints or features
 - **Use descriptive comments**: Document what each request tests
 - **Add assertions**: Always include expected status codes and important headers
-- **Environment variables**: Use your IDE's environment variable support for different environments
+- **Use variables**: Define base URLs and tokens as variables for reusability
+- **Use `@name` directives**: Name your requests for meaningful test method names
+- **Use `###` separators**: Clearly separate requests in multi-request files
 - **Version control**: Commit your `.http` files alongside your code
 
 ## 🏷️ Naming Conventions
@@ -257,6 +427,10 @@ Examples:
 - `GET https://api.example.com/users` → `get_api_example_com_0`
 - `POST https://localhost:5000/api/data` → `post_localhost_1`
 - `DELETE https://my-api.azurewebsites.net/items/123` → `delete_my_api_azurewebsites_net_2`
+
+When `@name` is used, the name becomes the test method name directly:
+- `# @name loginRequest` → `loginRequest`
+- `# @name getUserById` → `getUserById`
 
 ## 🚀 Performance Considerations
 
@@ -312,6 +486,10 @@ EXPECTED_RESPONSE_STATUS 404
 GET https://api.example.com/protected
 Authorization: Bearer invalid-token
 EXPECTED_RESPONSE_STATUS 401
+
+# Body content verification
+GET https://api.example.com/health
+EXPECTED_RESPONSE_BODY "healthy"
 ```
 
 ## 🔗 Integration with Popular Tools
@@ -379,6 +557,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Inspired by the REST Client extension for Visual Studio Code
 - Built on top of .NET Source Generators
 - Thanks to the xUnit and TUnit communities for excellent testing frameworks
+- Feature parity with [HTTP File Runner](https://github.com/christianhelle/httprunner) for .http file format support
 
 ## 🆘 Support and Troubleshooting
 
