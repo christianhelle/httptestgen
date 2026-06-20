@@ -93,4 +93,78 @@ public class AssertionsTests
             .That(first.Assertions.ExpectedHeaders["content-type"])
             .IsEqualTo("application/json");
     }
+
+    [Test]
+    public async Task Parse_Status_Assertions_Malformed_Should_Not_Throw()
+    {
+        var sut = new HttpFileParser();
+        var content = """
+            GET https://localhost/notfound
+            EXPECTED_RESPONSE_STATUS
+            """;
+        var requests = sut.Parse(content).ToList();
+
+        var first = requests.Single();
+        // Should use default status code (200) when malformed
+        await Assert
+            .That(first.Assertions.ExpectedStatusCode)
+            .IsEqualTo(200);
+    }
+
+    [Test]
+    public async Task Parse_Status_Assertions_Invalid_Value_Should_Not_Throw()
+    {
+        var sut = new HttpFileParser();
+        var content = """
+            GET https://localhost/notfound
+            EXPECTED_RESPONSE_STATUS invalid
+            """;
+        var requests = sut.Parse(content).ToList();
+
+        var first = requests.Single();
+        // Should use default status code (200) when invalid
+        await Assert
+            .That(first.Assertions.ExpectedStatusCode)
+            .IsEqualTo(200);
+    }
+
+    [Test]
+    public async Task Parse_Header_Assertions_With_Url_Value()
+    {
+        var sut = new HttpFileParser();
+        var content = """
+            GET https://localhost/redirect
+            EXPECTED_RESPONSE_HEADER Location: https://example.com/redirect
+            """;
+        var requests = sut.Parse(content).ToList();
+
+        var first = requests.Single();
+        await Assert
+            .That(first.Assertions.ExpectedHeaders.ContainsKey("Location"))
+            .IsTrue();
+        await Assert
+            .That(first.Assertions.ExpectedHeaders["Location"])
+            .IsEqualTo("https://example.com/redirect");
+    }
+
+    [Test]
+    public async Task Parse_Header_Assertions_Malformed_Should_Skip()
+    {
+        var sut = new HttpFileParser();
+        var content = """
+            GET https://localhost/notfound
+            EXPECTED_RESPONSE_HEADER
+            EXPECTED_RESPONSE_HEADER valid-header: value
+            """;
+        var requests = sut.Parse(content).ToList();
+
+        var first = requests.Single();
+        // Should only have the valid header
+        await Assert
+            .That(first.Assertions.ExpectedHeaders.Count)
+            .IsEqualTo(1);
+        await Assert
+            .That(first.Assertions.ExpectedHeaders.ContainsKey("valid-header"))
+            .IsTrue();
+    }
 }

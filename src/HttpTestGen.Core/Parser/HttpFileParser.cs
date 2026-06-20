@@ -54,22 +54,25 @@ public class HttpFileParser
 
             if (line.StartsWith("EXPECTED_RESPONSE_STATUS") && httpFileRequest is not null)
             {
-                var value = line.Split(' ')[1].Trim();
-                httpFileRequest!.Assertions.ExpectedStatusCode = int.Parse(value);
+                var parts = line.Split(' ');
+                if (parts.Length > 1 && int.TryParse(parts[1].Trim(), out var statusCode))
+                {
+                    httpFileRequest!.Assertions.ExpectedStatusCode = statusCode;
+                }
                 continue;
             }
 
             if (line.StartsWith("EXPECTED_RESPONSE_HEADER") && httpFileRequest is not null)
             {
                 var header = line.Substring("EXPECTED_RESPONSE_HEADER".Length).Trim();
-                var headerParts = header.Split(':');
-                if (headerParts.Length != 2)
+                var colonIndex = header.IndexOf(':');
+                if (colonIndex <= 0)
                 {
                     continue;
                 }
 
-                var headerName = headerParts[0].Trim();
-                var headerValue = headerParts[1].Trim();
+                var headerName = header.Substring(0, colonIndex).Trim();
+                var headerValue = header.Substring(colonIndex + 1).Trim();
                 httpFileRequest!.Assertions.ExpectedHeaders.Add(headerName, headerValue);
                 continue;
             }
@@ -79,9 +82,9 @@ public class HttpFileParser
                 line = lines[j].Trim();
                 if (line.StartsWith("#") || string.IsNullOrWhiteSpace(line))
                     continue;
-                body.AppendLine(line);
                 if (RegexUrl.Match(line).Success)
                     break;
+                body.AppendLine(line);
             }
 
             if (httpFileRequest == null) continue;
